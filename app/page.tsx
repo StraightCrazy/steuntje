@@ -14,12 +14,20 @@ import {
 } from "@/lib/steuntjesContent";
 import { hasSupabaseConfig } from "@/lib/supabase";
 
+/* ================= Types ================= */
 type ApiResponse = {
   antwoord?: string;
 };
 
+type SavedSteuntje = {
+  id: string;
+  text: string;
+  date: string;
+};
+
+/* ================= Component ================= */
 export default function Home() {
-  /* ---------------- Dag / avond ---------------- */
+  /* ---------- Dag / Avond ---------- */
   const [isAvond, setIsAvond] = useState(false);
 
   useEffect(() => {
@@ -29,37 +37,35 @@ export default function Home() {
     document.body.classList.toggle("avond", avond);
   }, []);
 
-  /* ---------------- Adem overlay ---------------- */
-  const [toonAdem, setToonAdem] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setToonAdem(false), 2800);
-    return () => clearTimeout(t);
-  }, []);
-
-  /* ---------------- State ---------------- */
+  /* ---------- State ---------- */
   const [tekstUitDatabase, setTekstUitDatabase] = useState<string | null>(null);
   const [gekozenThema, setGekozenThema] = useState<SteuntjeTheme>("rust");
   const [gevoel, setGevoel] = useState("");
   const [aiAntwoord, setAiAntwoord] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
 
-  const [bewaardeSteuntjes, setBewaardeSteuntjes] = useState<string[]>([]);
+  const [saved, setSaved] = useState<SavedSteuntje[]>([]);
   const [opgeslagen, setOpgeslagen] = useState(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* ---------------- Init ---------------- */
+  /* ---------- Init ---------- */
   useEffect(() => {
     getSteuntjeVanVandaag().then(setTekstUitDatabase);
     trackView();
 
-    const opgeslagen = JSON.parse(
-      localStorage.getItem("savedSteuntjes") || "[]"
-    ) as string[];
-
-    setBewaardeSteuntjes(opgeslagen);
+    const lokaal =
+      JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as SavedSteuntje[];
+    setSaved(lokaal);
   }, []);
 
-  /* ---------------- Steuntje ---------------- */
+  /* ---------- Adem overlay ---------- */
+  const [toonAdem, setToonAdem] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setToonAdem(false), 2600);
+    return () => clearTimeout(t);
+  }, []);
+
+  /* ---------- Steuntje ---------- */
   const fallbackSteuntje = useMemo(
     () => getSteuntjeByTheme(gekozenThema),
     [gekozenThema]
@@ -70,30 +76,36 @@ export default function Home() {
     ? "Dit is er nu voor jou"
     : fallbackSteuntje.title;
 
-  const miniActie = fallbackSteuntje.miniActie;
-
   const audioTekst = `${tekstVanVandaag}. ${
     isAvond
       ? "Je hoeft vandaag niets meer te dragen. Rust mag nu beginnen."
       : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."
   }`;
 
-  /* ---------------- Opslaan ---------------- */
+  /* ---------- Opslaan ---------- */
   function saveSteuntje() {
-    const bestaand =
-      JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
+    const nieuw: SavedSteuntje = {
+      id: crypto.randomUUID(),
+      text: tekstVanVandaag,
+      date: new Date().toISOString(),
+    };
 
-    const nieuw = [tekstVanVandaag, ...bestaand].slice(0, 20);
-
-    localStorage.setItem("savedSteuntjes", JSON.stringify(nieuw));
-    setBewaardeSteuntjes(nieuw);
+    const next = [nieuw, ...saved].slice(0, 20);
+    setSaved(next);
+    localStorage.setItem("savedSteuntjes", JSON.stringify(next));
 
     setOpgeslagen(true);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(() => setOpgeslagen(false), 2200);
   }
 
-  /* ---------------- AI ---------------- */
+  function verwijderSteuntje(id: string) {
+    const next = saved.filter((s) => s.id !== id);
+    setSaved(next);
+    localStorage.setItem("savedSteuntjes", JSON.stringify(next));
+  }
+
+  /* ---------- AI ---------- */
   async function verstuurGevoel() {
     if (!gevoel.trim() || loadingAI) return;
 
@@ -107,24 +119,20 @@ export default function Home() {
         body: JSON.stringify({ gevoel }),
       });
 
-      if (!res.ok) throw new Error("API error");
-
       const data = (await res.json()) as ApiResponse;
       setAiAntwoord(
         data.antwoord ??
           "Dank je om dit hier neer te leggen. Het hoeft nergens naartoe."
       );
     } catch {
-      const warmFallback = getFallbackSteuntje();
-      setAiAntwoord(
-        `Ik ben hier bij je. ${warmFallback.text} Misschien helpt dit nu: ${warmFallback.miniActie}`
-      );
+      const warm = getFallbackSteuntje();
+      setAiAntwoord(`Ik ben hier bij je. ${warm.text}`);
     } finally {
       setLoadingAI(false);
     }
   }
 
-  /* ---------------- Render ---------------- */
+  /* ---------- Render ---------- */
   return (
     <>
       {toonAdem && (
@@ -134,29 +142,24 @@ export default function Home() {
       )}
 
       <main className="app-shell">
-        {/* ========== STEUNTJE ========== */}
+        {/* ================= STEUNTJE ================= */}
         <section className="hero-card">
-          <div className="brand-row">
-            <span className="brand-mark" aria-hidden>♡</span>
-            <div>
-              <p className="kicker">Steuntje</p>
-              <h1>
-                {isAvond
-                  ? "De dag mag hier even eindigen."
-                  : "Je hoeft het even niet alleen te dragen."}
-              </h1>
-            </div>
-          </div>
+          <p className="kicker">Steuntje</p>
+
+          <h1>
+            {isAvond
+              ? "De dag mag hier even eindigen."
+              : "Je hoeft het even niet alleen te dragen."}
+          </h1>
 
           <div className="theme-switcher">
             {getThemeOptions().map((theme) => (
               <button
                 key={theme}
-                type="button"
+                onClick={() => setGekozenThema(theme)}
                 className={`theme-chip ${
                   gekozenThema === theme ? "is-active" : ""
                 }`}
-                onClick={() => setGekozenThema(theme)}
               >
                 {themeLabels[theme]}
               </button>
@@ -167,113 +170,81 @@ export default function Home() {
             <p className="steuntje-subtitle">{titelVanVandaag}</p>
             <p className="steuntje-text">{tekstVanVandaag}</p>
 
-            <p className="mini-actie">
-              <strong>Misschien helpt dit nu:</strong> {miniActie}
-            </p>
-
             <p className="afsluit-zin">
               {isAvond
-                ? "Je hoeft vandaag niets meer te dragen. Rust mag nu beginnen."
-                : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."}
+                ? "Rust mag nu beginnen."
+                : "Wees zacht voor jezelf vandaag."}
             </p>
 
             {isAvond && (
               <div className="audio-wrap">
-                <p className="audio-hint">
-                  Je mag dit ook even laten voorlezen.
-                </p>
                 <AudioSteuntje text={audioTekst} />
               </div>
             )}
           </article>
 
           <div className="cta-row">
-            <button
-              type="button"
-              onClick={saveSteuntje}
-              className="gevoel-knop"
-            >
+            <button onClick={saveSteuntje} className="gevoel-knop">
               💾 Bewaar dit steuntje
             </button>
-
             {opgeslagen && (
-              <p className="save-feedback">Opgeslagen voor later 💛</p>
+              <p className="save-feedback">Opgeslagen 💛</p>
             )}
-
             <ShareButton text={tekstVanVandaag} />
           </div>
 
           {!hasSupabaseConfig && (
-            <p className="setup-hint">
-              Dit is een demo-versie. Je eigen steuntjes verschijnen zodra alles
-              gekoppeld is.
-            </p>
+            <p className="setup-hint">Demo-versie</p>
           )}
         </section>
 
-        {/* ========== BEWAARDE STEUNTJES ========== */}
-        {bewaardeSteuntjes.length > 0 && (
-          <section className="support-card">
-            <h2>Je bewaarde steuntjes</h2>
-
-            <ul className="saved-list">
-              {bewaardeSteuntjes.slice(0, 5).map((s, i) => (
-                <li key={i}>
-                  <button
-                    type="button"
-                    className="saved-item"
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                  >
-                    {s}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* ========== ONDERSTEUNING ========== */}
+        {/* ================= BEWAARDE ================= */}
         <section className="support-card">
-          <h2>{isAvond ? "Wil je de dag loslaten?" : "Wil je iets kwijt?"}</h2>
+          <h2>Je bewaarde steuntjes</h2>
 
-          <p className="support-intro">
-            {isAvond
-              ? "Je hoeft niets meer op te lossen vanavond."
-              : "Je hoeft niets op te lossen. Eén zin is genoeg."}
-          </p>
+          {saved.length === 0 && (
+            <p className="support-intro">
+              Wat je bewaart, verschijnt hier 🌱
+            </p>
+          )}
 
-          <div className="gevoel-blok">
-            <input
-              value={gevoel}
-              onChange={(e) => setGevoel(e.target.value)}
-              placeholder={
-                isAvond
-                  ? "Je mag het hier laten liggen…"
-                  : "Je mag het hier gewoon neerleggen…"
-              }
-              className="gevoel-input"
-            />
+          <ul className="saved-list">
+            {saved.map((s) => (
+              <li key={s.id} className="saved-item">
+                <p>{s.text}</p>
+                <button
+                  onClick={() => verwijderSteuntje(s.id)}
+                  aria-label="Verwijder steuntje"
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-            <button
-              onClick={verstuurGevoel}
-              className="gevoel-knop"
-              disabled={loadingAI || !gevoel.trim()}
-              type="button"
-            >
-              {loadingAI ? "Ik luister…" : "Geef me een steuntje"}
-            </button>
+        {/* ================= ONDERSTEUNING ================= */}
+        <section className="support-card">
+          <h2>Wil je iets kwijt?</h2>
 
-            {aiAntwoord && (
-              <>
-                <div className="gevoel-antwoord">{aiAntwoord}</div>
-                <p className="afsluit-zin">
-                  Je hoeft hier niets meer mee te doen.
-                </p>
-              </>
-            )}
-          </div>
+          <input
+            value={gevoel}
+            onChange={(e) => setGevoel(e.target.value)}
+            placeholder="Je mag het hier gewoon neerleggen…"
+            className="gevoel-input"
+          />
+
+          <button
+            onClick={verstuurGevoel}
+            className="gevoel-knop"
+            disabled={loadingAI}
+          >
+            {loadingAI ? "Ik luister…" : "Geef me een steuntje"}
+          </button>
+
+          {aiAntwoord && (
+            <div className="gevoel-antwoord">{aiAntwoord}</div>
+          )}
         </section>
       </main>
     </>

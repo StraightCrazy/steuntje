@@ -69,10 +69,11 @@ export async function POST(req: Request) {
       ]);
     } else {
       antwoord = pick([
-        "Dank je om dit hier neer te leggen. Het hoeft nergens naartoe.",
-        "Ik lees wat je schrijft. Je hoeft niets te veranderen.",
-        "Wat je voelt mag hier rustig blijven liggen.",
-      ]);
+  `Dank je om dit hier neer te leggen. "${gevoel}" hoeft niets te worden, het mag er gewoon zijn.`,
+  "Ik lees wat je schrijft. Je hoeft niets te veranderen of te verklaren.",
+  "Wat je voelt mag hier rustig blijven liggen, zonder dat je iets moet doen.",
+]);
+
     }
 
     return NextResponse.json({ antwoord });

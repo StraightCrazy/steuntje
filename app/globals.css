@@ -414,3 +414,71 @@ body.avond .adem-overlay {
     transition: none !important;
   }
 }
+/* ==================================================
+   BEWAARDE STEUNTJES
+================================================== */
+
+.saved-list {
+  list-style: none;
+  margin-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.saved-item {
+  position: relative;
+  padding: 0.85rem 1rem 0.9rem;
+
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+
+  font-family: "Playfair Display", serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #3a2f29;
+
+  animation: fadeUp 0.35s ease both;
+}
+
+body.avond .saved-item {
+  background: rgba(35, 33, 30, 0.75);
+  color: #f0e8e2;
+  border-color: #2f2a26;
+}
+
+.saved-item p {
+  margin-right: 2.2rem;
+}
+
+/* ❌ subtiele verwijderknop */
+.saved-item button {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+
+  border: none;
+  background: transparent;
+
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0.55;
+
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.saved-item button:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Feedback na opslaan */
+.save-feedback {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--muted);
+  animation: fadeUp 0.3s ease both;
+}
