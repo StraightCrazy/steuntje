@@ -524,3 +524,122 @@ body.avond .saved-card {
   opacity: 1;
   text-decoration: underline;
 }
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+
+.saved-item {
+  position: relative;
+  padding: 0.9rem 1rem;
+  background: var(--accent-soft);
+  border-radius: 14px;
+  font-family: "Playfair Display", serif;
+  line-height: 1.6;
+}
+
+.saved-item button {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.saved-item button:hover {
+  opacity: 1;
+}
+/* ==================================================
+   BEWAARDE STEUNTJES
+================================================== */
+
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+}
+
+.saved-item {
+  position: relative;
+  padding: 1.1rem 1.3rem 1.1rem 1.1rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.65),
+    rgba(247,231,221,0.85)
+  );
+  border-radius: 18px;
+  box-shadow:
+    0 10px 25px rgba(90, 60, 40, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+
+  font-family: "Playfair Display", serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #3a2f29;
+
+  animation: fadeUp 0.5s ease both;
+}
+
+body.avond .saved-item {
+  background: linear-gradient(
+    135deg,
+    rgba(40,38,36,0.8),
+    rgba(28,26,24,0.9)
+  );
+  color: #eee6df;
+}
+
+/* zachte verwijderknop */
+.saved-item button {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.6rem;
+
+  border: none;
+  background: transparent;
+
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0.35;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.saved-item button:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+/* Bewaar-knop apart laten ademen */
+.cta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.save-feedback {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+  animation: fadeUp 0.4s ease both;
+}
+.theme-chip {
+  backdrop-filter: blur(6px);
+}
+
+.theme-chip.is-active {
+  box-shadow:
+    0 6px 18px rgba(184,121,87,0.35);
+}
+.steuntje-text {
+  transition: letter-spacing 0.6s ease;
+}
+
+.steuntje-panel:hover .steuntje-text {
+  letter-spacing: 0.015em;
+}
