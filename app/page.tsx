@@ -129,6 +129,8 @@ export default function Home() {
     <main className="app-shell">
       {/* ================= STEUNTJE ================= */}
       <section className="hero-card">
+        <h1 className="app-title">Steuntje</h1>
+
         <h1>
           {isAvond
             ? "De dag mag hier even eindigen."

@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Italianno&family=Inter:wght@400;500;600;700&display=swap");
+
 
 /* ==================================================
    DESIGN TOKENS
@@ -677,4 +678,168 @@ body.avond .saved-item {
   color: var(--muted);
   margin-top: 0.3rem;
   animation: fadeUp 0.3s ease both;
+}
+/* =========================================
+   APP NAAM — HANDGESCHREVEN
+========================================= */
+
+.app-title {
+  font-family: "Italianno", cursive;
+  font-size: 3.6rem;
+  line-height: 1;
+  color: #b87957;
+
+  text-align: center;
+  margin-bottom: 1.2rem;
+
+  transform: rotate(-2deg);
+  letter-spacing: 0.02em;
+}
+
+/* subtiele sierlijke onderlijn via pseudo-element */
+.app-title::after {
+  content: "";
+  display: block;
+  width: 78%;
+  height: 2px;
+  margin: 0.3rem auto 0;
+
+  background: linear-gradient(
+    to right,
+    transparent,
+    #b87957,
+    transparent
+  );
+
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+body.avond .app-title {
+  color: #e6c7b3;
+}
+
+body.avond .app-title::after {
+  background: linear-gradient(
+    to right,
+    transparent,
+    #e6c7b3,
+    transparent
+  );
+}
+/* ==================================================
+   APP NAAM – SUBTIELE INTRO ANIMATIE
+================================================== */
+
+.app-title {
+  font-family: "Italianno", cursive;
+  font-size: 3.6rem;
+  line-height: 1;
+  color: #b87957;
+
+  text-align: center;
+  margin-bottom: 1.2rem;
+
+  transform: rotate(-2deg);
+  letter-spacing: 0.02em;
+
+  animation: titleFadeIn 1.6s ease both;
+}
+
+/* sierlijke onderlijn */
+.app-title::after {
+  content: "";
+  display: block;
+  width: 78%;
+  height: 2px;
+  margin: 0.3rem auto 0;
+
+  background: linear-gradient(
+    to right,
+    transparent,
+    currentColor,
+    transparent
+  );
+
+  border-radius: 2px;
+  opacity: 0.55;
+}
+
+body.avond .app-title {
+  color: #e6c7b3;
+}
+
+/* lichte “ink settle” */
+@keyframes titleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) rotate(-2deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-1px) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(-2deg);
+  }
+}
+
+/* ==================================================
+   APP START – ZACHTE LOADING OVERLAY
+================================================== */
+
+.app-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+
+  display: grid;
+  place-items: center;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.7),
+    rgba(248, 241, 234, 0.95)
+  );
+
+  animation: loadingFadeOut 2.6s ease forwards;
+}
+
+body.avond .app-loading {
+  background: radial-gradient(
+    circle at center,
+    rgba(30, 28, 26, 0.75),
+    rgba(15, 14, 13, 0.98)
+  );
+}
+
+.loading-mark {
+  font-family: "Italianno", cursive;
+  font-size: 3rem;
+  color: #b87957;
+
+  opacity: 0;
+  animation: loadingIn 1.4s ease forwards;
+}
+
+body.avond .loading-mark {
+  color: #e6c7b3;
+}
+
+@keyframes loadingIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loadingFadeOut {
+  0%   { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
 }
