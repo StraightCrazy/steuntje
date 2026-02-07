@@ -1,34 +1,59 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   text: string;
 };
 
 export default function AudioSteuntje({ text }: Props) {
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [supported, setSupported] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
+  /* ---------- Support & cleanup ---------- */
   useEffect(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      setSupported(true);
-    }
+    if (typeof window === "undefined") return;
+    if (!("speechSynthesis" in window)) return;
+
+    setSupported(true);
+
+    const stop = () => {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stop();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      window.speechSynthesis.cancel();
+      stop();
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
     };
   }, []);
 
-  function speak() {
-    if (!supported || isSpeaking) return;
+  /* ---------- Toggle speak ---------- */
+  function toggleSpeak() {
+    if (!supported) return;
 
+    // STOP
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    // START
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "nl-BE";
-    utterance.rate = 0.82;
+    utterance.rate = document.body.classList.contains("avond") ? 0.78 : 0.88;
     utterance.pitch = 1;
     utterance.volume = 1;
 
@@ -36,7 +61,6 @@ export default function AudioSteuntje({ text }: Props) {
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
-    utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
   }
 
@@ -45,11 +69,14 @@ export default function AudioSteuntje({ text }: Props) {
   return (
     <button
       type="button"
-      onClick={speak}
+      onClick={toggleSpeak}
       className="audio-knop"
-      aria-label="Luister naar dit steuntje"
+      aria-pressed={isSpeaking}
+      aria-label={
+        isSpeaking ? "Stop voorlezen" : "Laat dit steuntje voorlezen"
+      }
     >
-      {isSpeaking ? "Even luisteren…" : "🔊 Luister rustig"}
+      {isSpeaking ? "⏸ Stop voorlezen" : "🔊 Laat dit voorlezen"}
     </button>
   );
 }

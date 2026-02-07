@@ -5,6 +5,14 @@ import ThemeToggle from "@/components/ThemeToggle";
 export const metadata: Metadata = {
   title: "Steuntje",
   description: "Een klein moment dat je dag zachter maakt.",
+  applicationName: "Steuntje",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({

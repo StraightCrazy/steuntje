@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 export default function ThemeToggle() {
   const [isAvond, setIsAvond] = useState(false);
 
-  // Kleine haptic feedback (mobiel/PWA)
+  /* ---------- Haptic feedback (PWA / mobiel) ---------- */
   function haptic() {
     if ("vibrate" in navigator) {
       navigator.vibrate(10);
     }
   }
 
-  // Init: voorkeur of tijdstip
+  /* ---------- Init: voorkeur > automatisch ---------- */
   useEffect(() => {
     const saved = localStorage.getItem("theme");
 
@@ -28,7 +28,7 @@ export default function ThemeToggle() {
       return;
     }
 
-    // Geen voorkeur → automatisch
+    // Geen voorkeur → tijdstip bepaalt
     const uur = new Date().getHours();
     const automatischAvond = uur >= 20 || uur < 6;
 
@@ -36,10 +36,11 @@ export default function ThemeToggle() {
     setIsAvond(automatischAvond);
   }, []);
 
+  /* ---------- Toggle ---------- */
   function toggleTheme() {
     const next = !isAvond;
-    setIsAvond(next);
 
+    setIsAvond(next);
     document.body.classList.toggle("avond", next);
     localStorage.setItem("theme", next ? "dark" : "light");
 
@@ -50,9 +51,10 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label="Dag- of nachtmodus"
-      title={isAvond ? "Schakel naar dagmodus" : "Schakel naar nachtmodus"}
       className="theme-toggle"
+      aria-label={isAvond ? "Schakel naar dagmodus" : "Schakel naar nachtmodus"}
+      title={isAvond ? "Schakel naar dagmodus" : "Schakel naar nachtmodus"}
+      aria-pressed={isAvond}
     >
       {isAvond ? "🌙" : "☀️"}
     </button>
