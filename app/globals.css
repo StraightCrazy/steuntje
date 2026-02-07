@@ -643,3 +643,38 @@ body.avond .saved-item {
 .steuntje-panel:hover .steuntje-text {
   letter-spacing: 0.015em;
 }
+/* ===============================
+   Bewaarde steuntjes – CTA
+================================ */
+
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.save-knop {
+  background: linear-gradient(135deg, #c88763, #b66f50);
+}
+
+.voor-later-link {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.25s ease;
+}
+
+.voor-later-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.save-feedback {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+  animation: fadeUp 0.3s ease both;
+}

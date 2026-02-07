@@ -19,7 +19,7 @@ type ApiResponse = {
 };
 
 export default function Home() {
-  /* ---------------- DAG / AVOND ---------------- */
+  /* ================= DAG / AVOND ================= */
   const [isAvond, setIsAvond] = useState(false);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Home() {
     document.body.classList.toggle("avond", avond);
   }, []);
 
-  /* ---------------- STATE ---------------- */
+  /* ================= STATE ================= */
   const [tekstUitDatabase, setTekstUitDatabase] = useState<string | null>(null);
   const [gekozenThema, setGekozenThema] = useState<SteuntjeTheme>("rust");
   const [gevoel, setGevoel] = useState("");
@@ -38,10 +38,9 @@ export default function Home() {
 
   const [opgeslagen, setOpgeslagen] = useState(false);
   const [savedSteuntjes, setSavedSteuntjes] = useState<string[]>([]);
-
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* ---------------- INIT ---------------- */
+  /* ================= INIT ================= */
   useEffect(() => {
     getSteuntjeVanVandaag().then(setTekstUitDatabase);
     trackView();
@@ -51,7 +50,7 @@ export default function Home() {
     setSavedSteuntjes(bestaand);
   }, []);
 
-  /* ---------------- STEUNTJE ---------------- */
+  /* ================= STEUNTJE ================= */
   const fallbackSteuntje = useMemo(
     () => getSteuntjeByTheme(gekozenThema),
     [gekozenThema]
@@ -70,9 +69,18 @@ export default function Home() {
       : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."
   }`;
 
-  /* ---------------- OPSLAAN ---------------- */
+  /* ================= OPSLAAN ================= */
   function saveSteuntje() {
-    const nieuw = [tekstVanVandaag, ...savedSteuntjes].slice(0, 20);
+    const bestaand =
+      JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
+
+    if (bestaand.includes(tekstVanVandaag)) {
+      setOpgeslagen(true);
+      setTimeout(() => setOpgeslagen(false), 1600);
+      return;
+    }
+
+    const nieuw = [tekstVanVandaag, ...bestaand].slice(0, 30);
     localStorage.setItem("savedSteuntjes", JSON.stringify(nieuw));
     setSavedSteuntjes(nieuw);
 
@@ -87,7 +95,7 @@ export default function Home() {
     setSavedSteuntjes(nieuw);
   }
 
-  /* ---------------- AI ---------------- */
+  /* ================= AI ================= */
   async function verstuurGevoel() {
     if (!gevoel.trim() || loadingAI) return;
 
@@ -116,18 +124,24 @@ export default function Home() {
     }
   }
 
-  /* ---------------- RENDER ---------------- */
+  /* ================= RENDER ================= */
   return (
     <main className="app-shell">
       {/* ================= STEUNTJE ================= */}
       <section className="hero-card">
-        <h1>{isAvond ? "De dag mag hier even eindigen." : "Je hoeft het even niet alleen te dragen."}</h1>
+        <h1>
+          {isAvond
+            ? "De dag mag hier even eindigen."
+            : "Je hoeft het even niet alleen te dragen."}
+        </h1>
 
         <div className="theme-switcher">
           {getThemeOptions().map((theme) => (
             <button
               key={theme}
-              className={`theme-chip ${gekozenThema === theme ? "is-active" : ""}`}
+              className={`theme-chip ${
+                gekozenThema === theme ? "is-active" : ""
+              }`}
               onClick={() => setGekozenThema(theme)}
             >
               {themeLabels[theme]}
@@ -153,16 +167,39 @@ export default function Home() {
         </article>
 
         <div className="cta-row">
-          <button onClick={saveSteuntje} className="gevoel-knop">
-            🤍 Bewaar dit steuntje
-          </button>
-          {opgeslagen && <p className="save-feedback">Bewaard voor later</p>}
+          <div className="save-row">
+            <button
+              type="button"
+              onClick={saveSteuntje}
+              className="gevoel-knop save-knop"
+            >
+              🤍 Bewaar dit steuntje
+            </button>
+
+            <a href="#voor-later" className="voor-later-link">
+              Voor later →
+            </a>
+          </div>
+
+          {opgeslagen && (
+            <p className="save-feedback">
+              Opgeslagen. Je vindt het terug bij ‘Voor later’ 💛
+            </p>
+          )}
+
           <ShareButton text={tekstVanVandaag} />
         </div>
+
+        {!hasSupabaseConfig && (
+          <p className="setup-hint">
+            Dit is een demo-versie. Je eigen steuntjes verschijnen zodra alles
+            gekoppeld is.
+          </p>
+        )}
       </section>
 
       {/* ================= BEWAARD ================= */}
-      <section className="support-card">
+      <section id="voor-later" className="support-card">
         <h2>Voor later bewaard</h2>
 
         {savedSteuntjes.length === 0 ? (
@@ -176,7 +213,7 @@ export default function Home() {
                 <p>{tekst}</p>
                 <button
                   onClick={() => verwijderSteuntje(i)}
-                  aria-label="Verwijder"
+                  aria-label="Verwijder steuntje"
                 >
                   ✕
                 </button>
@@ -206,7 +243,9 @@ export default function Home() {
             {loadingAI ? "Ik luister…" : "Geef me een steuntje"}
           </button>
 
-          {aiAntwoord && <div className="gevoel-antwoord">{aiAntwoord}</div>}
+          {aiAntwoord && (
+            <div className="gevoel-antwoord">{aiAntwoord}</div>
+          )}
         </div>
       </section>
     </main>
