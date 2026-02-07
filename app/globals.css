@@ -482,3 +482,45 @@ body.avond .saved-item {
   color: var(--muted);
   animation: fadeUp 0.3s ease both;
 }
+/* ===============================
+   Voor later (bewaarde steuntjes)
+================================ */
+
+.saved-list {
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.2rem;
+}
+
+.saved-card {
+  background: var(--accent-soft);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  animation: fadeUp 0.4s ease both;
+}
+
+body.avond .saved-card {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.saved-text {
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.loslaat-knop {
+  margin-top: 0.6rem;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.loslaat-knop:hover {
+  opacity: 1;
+  text-decoration: underline;
+}

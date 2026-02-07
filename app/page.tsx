@@ -14,37 +14,28 @@ import {
 } from "@/lib/steuntjesContent";
 import { hasSupabaseConfig } from "@/lib/supabase";
 
-/* ================= Types ================= */
 type ApiResponse = {
   antwoord?: string;
 };
 
-type SavedSteuntje = {
-  id: string;
-  text: string;
-  date: string;
-};
-
-/* ================= Component ================= */
 export default function Home() {
-  /* ---------- Dag / Avond ---------- */
+  /* ---------- Dag / avond ---------- */
   const [isAvond, setIsAvond] = useState(false);
 
   useEffect(() => {
     const uur = new Date().getHours();
-    const avond = uur >= 20 || uur < 6;
-    setIsAvond(avond);
-    document.body.classList.toggle("avond", avond);
+    setIsAvond(uur >= 20 || uur < 6);
   }, []);
 
   /* ---------- State ---------- */
   const [tekstUitDatabase, setTekstUitDatabase] = useState<string | null>(null);
   const [gekozenThema, setGekozenThema] = useState<SteuntjeTheme>("rust");
+  const [heeftThemaGekozen, setHeeftThemaGekozen] = useState(false);
+
   const [gevoel, setGevoel] = useState("");
   const [aiAntwoord, setAiAntwoord] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
 
-  const [saved, setSaved] = useState<SavedSteuntje[]>([]);
   const [opgeslagen, setOpgeslagen] = useState(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -52,17 +43,6 @@ export default function Home() {
   useEffect(() => {
     getSteuntjeVanVandaag().then(setTekstUitDatabase);
     trackView();
-
-    const lokaal =
-      JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as SavedSteuntje[];
-    setSaved(lokaal);
-  }, []);
-
-  /* ---------- Adem overlay ---------- */
-  const [toonAdem, setToonAdem] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setToonAdem(false), 2600);
-    return () => clearTimeout(t);
   }, []);
 
   /* ---------- Steuntje ---------- */
@@ -71,10 +51,17 @@ export default function Home() {
     [gekozenThema]
   );
 
-  const tekstVanVandaag = tekstUitDatabase ?? fallbackSteuntje.text;
-  const titelVanVandaag = tekstUitDatabase
-    ? "Dit is er nu voor jou"
-    : fallbackSteuntje.title;
+  const gebruikThema = heeftThemaGekozen || !tekstUitDatabase;
+
+  const tekstVanVandaag = gebruikThema
+    ? fallbackSteuntje.text
+    : tekstUitDatabase;
+
+  const titelVanVandaag = gebruikThema
+    ? fallbackSteuntje.title
+    : "Dit is er nu voor jou";
+
+  const miniActie = fallbackSteuntje.miniActie;
 
   const audioTekst = `${tekstVanVandaag}. ${
     isAvond
@@ -84,25 +71,15 @@ export default function Home() {
 
   /* ---------- Opslaan ---------- */
   function saveSteuntje() {
-    const nieuw: SavedSteuntje = {
-      id: crypto.randomUUID(),
-      text: tekstVanVandaag,
-      date: new Date().toISOString(),
-    };
+    const bestaand =
+      JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
 
-    const next = [nieuw, ...saved].slice(0, 20);
-    setSaved(next);
-    localStorage.setItem("savedSteuntjes", JSON.stringify(next));
+    const nieuw = [tekstVanVandaag, ...bestaand].slice(0, 20);
+    localStorage.setItem("savedSteuntjes", JSON.stringify(nieuw));
 
     setOpgeslagen(true);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(() => setOpgeslagen(false), 2200);
-  }
-
-  function verwijderSteuntje(id: string) {
-    const next = saved.filter((s) => s.id !== id);
-    setSaved(next);
-    localStorage.setItem("savedSteuntjes", JSON.stringify(next));
   }
 
   /* ---------- AI ---------- */
@@ -120,13 +97,11 @@ export default function Home() {
       });
 
       const data = (await res.json()) as ApiResponse;
-      setAiAntwoord(
-        data.antwoord ??
-          "Dank je om dit hier neer te leggen. Het hoeft nergens naartoe."
-      );
+      setAiAntwoord(data.antwoord ?? null);
     } catch {
-      const warm = getFallbackSteuntje();
-      setAiAntwoord(`Ik ben hier bij je. ${warm.text}`);
+      setAiAntwoord(
+        "Dank je om dit hier neer te leggen. Het hoeft nergens naartoe."
+      );
     } finally {
       setLoadingAI(false);
     }
@@ -134,99 +109,86 @@ export default function Home() {
 
   /* ---------- Render ---------- */
   return (
-    <>
-      {toonAdem && (
-        <div className="adem-overlay" aria-hidden>
-          <div className="adem-kring" />
-        </div>
-      )}
-
-      <main className="app-shell">
-        {/* ================= STEUNTJE ================= */}
-        <section className="hero-card">
-          <p className="kicker">Steuntje</p>
-
-          <h1>
-            {isAvond
-              ? "De dag mag hier even eindigen."
-              : "Je hoeft het even niet alleen te dragen."}
-          </h1>
-
-          <div className="theme-switcher">
-            {getThemeOptions().map((theme) => (
-              <button
-                key={theme}
-                onClick={() => setGekozenThema(theme)}
-                className={`theme-chip ${
-                  gekozenThema === theme ? "is-active" : ""
-                }`}
-              >
-                {themeLabels[theme]}
-              </button>
-            ))}
-          </div>
-
-          <article className="steuntje-panel">
-            <p className="steuntje-subtitle">{titelVanVandaag}</p>
-            <p className="steuntje-text">{tekstVanVandaag}</p>
-
-            <p className="afsluit-zin">
+    <main className="app-shell">
+      <section className="hero-card">
+        <div className="brand-row">
+          <span className="brand-mark">♡</span>
+          <div>
+            <p className="kicker">Steuntje</p>
+            <h1>
               {isAvond
-                ? "Rust mag nu beginnen."
-                : "Wees zacht voor jezelf vandaag."}
-            </p>
-
-            {isAvond && (
-              <div className="audio-wrap">
-                <AudioSteuntje text={audioTekst} />
-              </div>
-            )}
-          </article>
-
-          <div className="cta-row">
-            <button onClick={saveSteuntje} className="gevoel-knop">
-              💾 Bewaar dit steuntje
-            </button>
-            {opgeslagen && (
-              <p className="save-feedback">Opgeslagen 💛</p>
-            )}
-            <ShareButton text={tekstVanVandaag} />
+                ? "De dag mag hier even eindigen."
+                : "Je hoeft het even niet alleen te dragen."}
+            </h1>
           </div>
+        </div>
 
-          {!hasSupabaseConfig && (
-            <p className="setup-hint">Demo-versie</p>
+        <div className="theme-switcher">
+          {getThemeOptions().map((theme) => (
+            <button
+              key={theme}
+              className={`theme-chip ${
+                gekozenThema === theme ? "is-active" : ""
+              }`}
+              onClick={() => {
+                setGekozenThema(theme);
+                setHeeftThemaGekozen(true);
+              }}
+            >
+              {themeLabels[theme]}
+            </button>
+          ))}
+        </div>
+
+        <article className="steuntje-panel">
+          <p className="steuntje-subtitle">{titelVanVandaag}</p>
+          <p className="steuntje-text">{tekstVanVandaag}</p>
+
+          <p className="mini-actie">
+            <strong>Misschien helpt dit nu:</strong> {miniActie}
+          </p>
+
+          <p className="afsluit-zin">
+            {isAvond
+              ? "Je hoeft vandaag niets meer te dragen. Rust mag nu beginnen."
+              : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."}
+          </p>
+
+          {isAvond && (
+            <div className="audio-wrap">
+              <AudioSteuntje text={audioTekst} />
+            </div>
           )}
-        </section>
+        </article>
 
-        {/* ================= BEWAARDE ================= */}
-        <section className="support-card">
-          <h2>Je bewaarde steuntjes</h2>
+        <div className="cta-row" style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          <button className="gevoel-knop" onClick={saveSteuntje}>
+            ♡ Bewaar dit steuntje
+          </button>
 
-          {saved.length === 0 && (
-            <p className="support-intro">
-              Wat je bewaart, verschijnt hier 🌱
-            </p>
+          {opgeslagen && (
+            <p className="save-feedback">Opgeslagen voor later 💛</p>
           )}
 
-          <ul className="saved-list">
-            {saved.map((s) => (
-              <li key={s.id} className="saved-item">
-                <p>{s.text}</p>
-                <button
-                  onClick={() => verwijderSteuntje(s.id)}
-                  aria-label="Verwijder steuntje"
-                >
-                  ✕
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+          <ShareButton text={tekstVanVandaag} />
+        </div>
 
-        {/* ================= ONDERSTEUNING ================= */}
-        <section className="support-card">
-          <h2>Wil je iets kwijt?</h2>
+        {!hasSupabaseConfig && (
+          <p className="setup-hint">
+            Dit is een demo-versie. Je eigen steuntjes verschijnen zodra alles
+            gekoppeld is.
+          </p>
+        )}
+      </section>
 
+      <section className="support-card">
+        <h2>Wil je iets kwijt?</h2>
+
+        <p className="support-intro">
+          Je hoeft niets op te lossen. Eén zin is genoeg.
+        </p>
+
+        <div className="gevoel-blok">
           <input
             value={gevoel}
             onChange={(e) => setGevoel(e.target.value)}
@@ -237,7 +199,7 @@ export default function Home() {
           <button
             onClick={verstuurGevoel}
             className="gevoel-knop"
-            disabled={loadingAI}
+            disabled={loadingAI || !gevoel.trim()}
           >
             {loadingAI ? "Ik luister…" : "Geef me een steuntje"}
           </button>
@@ -245,8 +207,8 @@ export default function Home() {
           {aiAntwoord && (
             <div className="gevoel-antwoord">{aiAntwoord}</div>
           )}
-        </section>
-      </main>
-    </>
+        </div>
+      </section>
+    </main>
   );
 }
