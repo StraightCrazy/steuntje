@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import ShareButton from "@/components/ShareButton";
+import AudioSteuntje from "@/components/AudioSteuntje";
 import { getSteuntjeVanVandaag } from "@/lib/getSteuntjes";
 import { trackView } from "@/lib/stats";
 import {
@@ -18,29 +19,48 @@ type ApiResponse = {
 };
 
 export default function Home() {
+  /* ================= Tijd ================= */
+  const [isAvond, setIsAvond] = useState(false);
+
+  useEffect(() => {
+    const uur = new Date().getHours();
+    setIsAvond(uur >= 20 || uur < 6);
+  }, []);
+
+  /* ================= State ================= */
   const [tekstUitDatabase, setTekstUitDatabase] = useState<string | null>(null);
   const [gekozenThema, setGekozenThema] = useState<SteuntjeTheme>("rust");
   const [gevoel, setGevoel] = useState("");
   const [aiAntwoord, setAiAntwoord] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
 
+  /* ================= Init ================= */
   useEffect(() => {
     getSteuntjeVanVandaag().then(setTekstUitDatabase);
     trackView();
   }, []);
 
+  /* ================= Steuntje ================= */
   const fallbackSteuntje = useMemo(
     () => getSteuntjeByTheme(gekozenThema),
     [gekozenThema]
   );
 
   const tekstVanVandaag = tekstUitDatabase ?? fallbackSteuntje.text;
+
   const titelVanVandaag = tekstUitDatabase
-    ? "Voor jou vandaag"
+    ? "Dit is er nu voor jou"
     : fallbackSteuntje.title;
 
   const miniActie = fallbackSteuntje.miniActie;
 
+  const audioTekst = `${tekstVanVandaag}. ${
+    isAvond
+      ? "Je hoeft vandaag niets meer te dragen. Rust mag nu beginnen."
+      : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."
+  }`;
+
+  /* ================= AI ================= */
   async function verstuurGevoel() {
     if (!gevoel.trim() || loadingAI) return;
 
@@ -57,17 +77,22 @@ export default function Home() {
       if (!res.ok) throw new Error("API error");
 
       const data = (await res.json()) as ApiResponse;
-      setAiAntwoord(data.antwoord ?? "Ik ben er voor je.");
+
+      setAiAntwoord(
+        data.antwoord ??
+          "Dank je om dit hier neer te leggen. Het hoeft nergens naartoe."
+      );
     } catch {
       const warmFallback = getFallbackSteuntje();
       setAiAntwoord(
-        `Ik ben er voor je. ${warmFallback.text} Probeer dit nu: ${warmFallback.miniActie}`
+        `Ik ben hier bij je. ${warmFallback.text} Misschien helpt dit nu: ${warmFallback.miniActie}`
       );
     } finally {
       setLoadingAI(false);
     }
   }
 
+  /* ================= Render ================= */
   return (
     <main className="app-shell">
       <section className="hero-card">
@@ -77,7 +102,11 @@ export default function Home() {
           </span>
           <div>
             <p className="kicker">Steuntje</p>
-            <h1>Een klein moment dat je dag zachter maakt.</h1>
+            <h1>
+              {isAvond
+                ? "De dag mag hier even eindigen."
+                : "Je hoeft het even niet alleen te dragen."}
+            </h1>
           </div>
         </div>
 
@@ -99,33 +128,54 @@ export default function Home() {
         <article className="steuntje-panel">
           <p className="steuntje-subtitle">{titelVanVandaag}</p>
           <p className="steuntje-text">{tekstVanVandaag}</p>
+
           <p className="mini-actie">
-            <strong>Mini-actie:</strong> {miniActie}
+            <strong>Misschien helpt dit nu:</strong> {miniActie}
           </p>
+
+          <p className="afsluit-zin">
+            {isAvond
+              ? "Je hoeft vandaag niets meer te dragen. Rust mag nu beginnen."
+              : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."}
+          </p>
+
+          {/* 🔊 AUDIO KNOP */}
+          <AudioSteuntje text={audioTekst} />
         </article>
 
         {!hasSupabaseConfig && (
           <p className="setup-hint">
-            Demo-modus actief: voeg je Supabase keys toe in `.env.local`.
+            Dit is een demo-versie. Je eigen steuntjes verschijnen zodra alles
+            gekoppeld is.
           </p>
         )}
 
         <div className="cta-row">
+          <p className="deel-hint">
+            Als dit iemand anders kan helpen, mag je het doorgeven.
+          </p>
           <ShareButton text={tekstVanVandaag} />
         </div>
       </section>
 
       <section className="support-card">
-        <h2>Vertel even hoe je je voelt</h2>
+        <h2>{isAvond ? "Wil je de dag loslaten?" : "Wil je iets kwijt?"}</h2>
+
         <p className="support-intro">
-          Schrijf één zin. Je krijgt meteen een warm antwoord terug.
+          {isAvond
+            ? "Je hoeft niets meer op te lossen vanavond."
+            : "Je hoeft niets op te lossen. Eén zin is genoeg."}
         </p>
 
         <div className="gevoel-blok">
           <input
             value={gevoel}
             onChange={(e) => setGevoel(e.target.value)}
-            placeholder="Bijv. ik ben moe en overprikkeld…"
+            placeholder={
+              isAvond
+                ? "Je mag het hier laten liggen…"
+                : "Je mag het hier gewoon neerleggen…"
+            }
             className="gevoel-input"
           />
 
@@ -139,7 +189,10 @@ export default function Home() {
           </button>
 
           {aiAntwoord && (
-            <div className="gevoel-antwoord">{aiAntwoord}</div>
+            <>
+              <div className="gevoel-antwoord">{aiAntwoord}</div>
+              <p className="afsluit-zin">Je hoeft hier niets meer mee te doen.</p>
+            </>
           )}
         </div>
       </section>

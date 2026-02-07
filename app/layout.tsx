@@ -1,10 +1,10 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import UpdateListener from "@/components/UpdateListener";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Steuntje",
-  description: "Dagelijkse emotionele EHBO in 20 seconden.",
+  description: "Een klein moment dat je dag zachter maakt.",
 };
 
 export default function RootLayout({
@@ -13,9 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nl">
+    <html lang="nl" suppressHydrationWarning>
       <body>
-        <UpdateListener />
+        <ThemeToggle />
         {children}
       </body>
     </html>
