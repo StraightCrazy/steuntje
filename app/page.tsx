@@ -19,9 +19,7 @@ type ApiResponse = {
 };
 
 export default function Home() {
-  /* --------------------------------------------------
-     DAG / AVOND
-  -------------------------------------------------- */
+  /* ---------------- Dag / avond ---------------- */
   const [isAvond, setIsAvond] = useState(false);
 
   useEffect(() => {
@@ -31,39 +29,37 @@ export default function Home() {
     document.body.classList.toggle("avond", avond);
   }, []);
 
-  /* --------------------------------------------------
-     STATE
-  -------------------------------------------------- */
+  /* ---------------- Adem overlay ---------------- */
+  const [toonAdem, setToonAdem] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setToonAdem(false), 2800);
+    return () => clearTimeout(t);
+  }, []);
+
+  /* ---------------- State ---------------- */
   const [tekstUitDatabase, setTekstUitDatabase] = useState<string | null>(null);
   const [gekozenThema, setGekozenThema] = useState<SteuntjeTheme>("rust");
   const [gevoel, setGevoel] = useState("");
   const [aiAntwoord, setAiAntwoord] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
 
+  const [bewaardeSteuntjes, setBewaardeSteuntjes] = useState<string[]>([]);
   const [opgeslagen, setOpgeslagen] = useState(false);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* --------------------------------------------------
-     INIT
-  -------------------------------------------------- */
+  /* ---------------- Init ---------------- */
   useEffect(() => {
     getSteuntjeVanVandaag().then(setTekstUitDatabase);
     trackView();
+
+    const opgeslagen = JSON.parse(
+      localStorage.getItem("savedSteuntjes") || "[]"
+    ) as string[];
+
+    setBewaardeSteuntjes(opgeslagen);
   }, []);
 
-  /* --------------------------------------------------
-     ADEM-OVERLAY (eenmalig)
-  -------------------------------------------------- */
-  const [toonAdem, setToonAdem] = useState(true);
-
-  useEffect(() => {
-    const t = setTimeout(() => setToonAdem(false), 2800);
-    return () => clearTimeout(t);
-  }, []);
-
-  /* --------------------------------------------------
-     STEUNTJE
-  -------------------------------------------------- */
+  /* ---------------- Steuntje ---------------- */
   const fallbackSteuntje = useMemo(
     () => getSteuntjeByTheme(gekozenThema),
     [gekozenThema]
@@ -82,22 +78,22 @@ export default function Home() {
       : "Dat is genoeg voor nu. Wees zacht voor jezelf vandaag."
   }`;
 
-  /* --------------------------------------------------
-     OPSLAAN
-  -------------------------------------------------- */
+  /* ---------------- Opslaan ---------------- */
   function saveSteuntje() {
-    localStorage.setItem("savedSteuntje", tekstVanVandaag);
-    setOpgeslagen(true);
+    const bestaand =
+      JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
 
+    const nieuw = [tekstVanVandaag, ...bestaand].slice(0, 20);
+
+    localStorage.setItem("savedSteuntjes", JSON.stringify(nieuw));
+    setBewaardeSteuntjes(nieuw);
+
+    setOpgeslagen(true);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    saveTimeout.current = setTimeout(() => {
-      setOpgeslagen(false);
-    }, 2200);
+    saveTimeout.current = setTimeout(() => setOpgeslagen(false), 2200);
   }
 
-  /* --------------------------------------------------
-     AI
-  -------------------------------------------------- */
+  /* ---------------- AI ---------------- */
   async function verstuurGevoel() {
     if (!gevoel.trim() || loadingAI) return;
 
@@ -128,9 +124,7 @@ export default function Home() {
     }
   }
 
-  /* --------------------------------------------------
-     RENDER
-  -------------------------------------------------- */
+  /* ---------------- Render ---------------- */
   return (
     <>
       {toonAdem && (
@@ -140,12 +134,10 @@ export default function Home() {
       )}
 
       <main className="app-shell">
-        {/* ================= STEUNTJE ================= */}
+        {/* ========== STEUNTJE ========== */}
         <section className="hero-card">
           <div className="brand-row">
-            <span className="brand-mark" aria-hidden>
-              ♡
-            </span>
+            <span className="brand-mark" aria-hidden>♡</span>
             <div>
               <p className="kicker">Steuntje</p>
               <h1>
@@ -219,7 +211,30 @@ export default function Home() {
           )}
         </section>
 
-        {/* ================= ONDERSTEUNING ================= */}
+        {/* ========== BEWAARDE STEUNTJES ========== */}
+        {bewaardeSteuntjes.length > 0 && (
+          <section className="support-card">
+            <h2>Je bewaarde steuntjes</h2>
+
+            <ul className="saved-list">
+              {bewaardeSteuntjes.slice(0, 5).map((s, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    className="saved-item"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                  >
+                    {s}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* ========== ONDERSTEUNING ========== */}
         <section className="support-card">
           <h2>{isAvond ? "Wil je de dag loslaten?" : "Wil je iets kwijt?"}</h2>
 
