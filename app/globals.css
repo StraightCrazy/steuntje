@@ -843,3 +843,47 @@ body.avond .loading-mark {
   85%  { opacity: 1; }
   100% { opacity: 0; pointer-events: none; }
 }
+/* ===============================
+   BRAND LOGO
+================================ */
+
+.brand-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.brand-logo img {
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+}
+
+/* Avondmodus: iets lichter */
+body.avond .brand-logo img {
+  filter: brightness(1.15) contrast(1.05);
+}
+/* ===============================
+   INPUT – DAG / NACHT FIX
+================================ */
+
+.gevoel-input {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+}
+
+.gevoel-input::placeholder {
+  color: var(--muted);
+}
+
+/* Avondmodus */
+body.avond .gevoel-input {
+  background: rgba(20, 18, 16, 0.9);
+  color: #f4efe9;
+  border-color: var(--line);
+}
+
+body.avond .gevoel-input::placeholder {
+  color: #b6ada6;
+}

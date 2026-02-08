@@ -127,9 +127,15 @@ export default function Home() {
   /* ================= RENDER ================= */
   return (
     <main className="app-shell">
-      {/* ================= STEUNTJE ================= */}
       <section className="hero-card">
-        <h1 className="app-title">Steuntje</h1>
+        {/* 🌿 LOGO */}
+        <div className="brand-logo">
+          <img
+            src="/brand/steuntje-logo.png"
+            alt="Steuntje"
+            draggable={false}
+          />
+        </div>
 
         <h1>
           {isAvond
@@ -200,7 +206,6 @@ export default function Home() {
         )}
       </section>
 
-      {/* ================= BEWAARD ================= */}
       <section id="voor-later" className="support-card">
         <h2>Voor later bewaard</h2>
 
@@ -225,7 +230,6 @@ export default function Home() {
         )}
       </section>
 
-      {/* ================= GEVOEL ================= */}
       <section className="support-card">
         <h2>{isAvond ? "Wil je de dag loslaten?" : "Wil je iets kwijt?"}</h2>
 
