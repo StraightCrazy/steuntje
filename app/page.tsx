@@ -128,14 +128,7 @@ export default function Home() {
   return (
     <main className="app-shell">
       <section className="hero-card">
-        {/* 🌿 LOGO */}
-        <div className="brand-logo">
-          <img
-            src="/brand/steuntje-logo.png"
-            alt="Steuntje"
-            draggable={false}
-          />
-        </div>
+        
 
         <h1>
           {isAvond
