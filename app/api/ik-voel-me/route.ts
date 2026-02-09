@@ -1,86 +1,67 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import OpenAI from "openai";
 
-/* Kleine helper */
-function pick(arr: string[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
 export async function POST(req: Request) {
   try {
-    const { gevoel } = await req.json();
+    const body = await req.json();
+    const gevoel = body.gevoel?.trim();
 
-    if (!gevoel || typeof gevoel !== "string") {
+    if (!gevoel) {
       return NextResponse.json({
-        antwoord: "Ik ben hier voor je. Je mag rustig beginnen, als je wil.",
+        antwoord:
+          "Ik hoor je. Je hoeft het niet perfect te verwoorden. Wat er is, is genoeg.",
       });
     }
 
-    const tekst = gevoel.toLowerCase();
+    // 🔹 Prompt ophalen uit Supabase
+    const { data: settings } = await supabase
+      .from("ai_settings")
+      .select("prompt")
+      .eq("name", "steuntje_v1")
+      .single();
 
-    /* ---------------- Toonherkenning ---------------- */
-    const isMoe =
-      tekst.includes("moe") ||
-      tekst.includes("leeg") ||
-      tekst.includes("uitgeput");
+    const systemPrompt =
+      settings?.prompt ??
+      "Je bent Steuntje. Je reageert warm, menselijk en veilig.";
 
-    const isVerdrietig =
-      tekst.includes("verdriet") ||
-      tekst.includes("pijn") ||
-      tekst.includes("verdrietig") ||
-      tekst.includes("eenzaam");
+    // 🔹 AI call
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: gevoel,
+        },
+      ],
+      temperature: 0.8,
+      max_tokens: 180,
+    });
 
-    const isBoos =
-      tekst.includes("boos") ||
-      tekst.includes("kwaad") ||
-      tekst.includes("frustratie");
-
-    const isOnzeker =
-      tekst.includes("bang") ||
-      tekst.includes("twijfel") ||
-      tekst.includes("onzeker") ||
-      tekst.includes("angst");
-
-    /* ---------------- Antwoorden ---------------- */
-    let antwoord: string;
-
-    if (isMoe) {
-      antwoord = pick([
-        "Het klinkt alsof je al veel hebt gedragen. Je hoeft nu niets meer op te lossen.",
-        "Moe zijn mag. Soms is rust het enige juiste antwoord.",
-        "Je mag hier even landen. Dat is genoeg voor dit moment.",
-      ]);
-    } else if (isVerdrietig) {
-      antwoord = pick([
-        "Het is oké dat dit pijn doet. Je hoeft hier niet sterk te zijn.",
-        "Dank je om dit te delen. Verdriet hoeft niet weg.",
-        "Je gevoel mag hier zacht bestaan, zonder uitleg.",
-      ]);
-    } else if (isBoos) {
-      antwoord = pick([
-        "Boosheid zegt vaak dat iets belangrijk is. Je mag dat voelen.",
-        "Je hoeft dit niet te corrigeren. Het mag er gewoon zijn.",
-        "Ook dit gevoel verdient ruimte, zonder oordeel.",
-      ]);
-    } else if (isOnzeker) {
-      antwoord = pick([
-        "Het is begrijpelijk dat je twijfelt. Je hoeft nu niets te beslissen.",
-        "Bang zijn betekent niet dat je zwak bent.",
-        "Je mag dit hier even neerleggen. Dat is genoeg.",
-      ]);
-    } else {
-      antwoord = pick([
-  `Dank je om dit hier neer te leggen. "${gevoel}" hoeft niets te worden, het mag er gewoon zijn.`,
-  "Ik lees wat je schrijft. Je hoeft niets te veranderen of te verklaren.",
-  "Wat je voelt mag hier rustig blijven liggen, zonder dat je iets moet doen.",
-]);
-
-    }
+    const antwoord =
+      completion.choices[0]?.message?.content ??
+      "Ik ben hier bij je. Je hoeft het niet alleen te dragen.";
 
     return NextResponse.json({ antwoord });
-  } catch {
+  } catch (error) {
+    console.error("AI error:", error);
+
     return NextResponse.json({
       antwoord:
-        "Ik ben hier bij je. Zelfs als woorden even moeilijk zijn.",
+        "Ik ben hier bij je. Ook als woorden even struikelen. Neem rustig adem.",
     });
   }
 }
