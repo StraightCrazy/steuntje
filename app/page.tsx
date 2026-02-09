@@ -130,9 +130,8 @@ export default function Home() {
       {/* ================= HERO ================= */}
       <section className="hero-card">
         {/* 🌿 APP NAAM */}
-        <h1 className="app-title">
-          Steuntje <span className="app-heart">♡</span>
-        </h1>
+        <h1 className="app-title">Steuntje</h1>
+        <div className="app-heart">♡</div>
 
         {/* 🌿 Introzin */}
         <h2 className="hero-zin">
@@ -176,23 +175,17 @@ export default function Home() {
 
         {/* 🌿 Acties */}
         <div className="cta-row">
-          <div className="save-row">
-            <button
-              type="button"
-              onClick={saveSteuntje}
-              className="gevoel-knop save-knop"
-            >
-              ♡ Bewaar dit steuntje
-            </button>
-
-            <a href="#voor-later" className="voor-later-link">
-              Voor later →
-            </a>
-          </div>
+          <button
+            type="button"
+            onClick={saveSteuntje}
+            className="gevoel-knop save-knop"
+          >
+            ♡ Bewaar dit steuntje
+          </button>
 
           {opgeslagen && (
             <p className="save-feedback">
-              Opgeslagen. Je vindt het terug bij ‘Voor later’ 💛
+              Opgeslagen. Je vindt het hieronder terug 💛
             </p>
           )}
 
@@ -207,9 +200,9 @@ export default function Home() {
         )}
       </section>
 
-      {/* ================= VOOR LATER ================= */}
+      {/* ================= BEWAARDE STEUNTJES ================= */}
       <section id="voor-later" className="support-card">
-        <h2>Voor later bewaard</h2>
+        <h2>Bewaarde steuntjes</h2>
 
         {savedSteuntjes.length === 0 ? (
           <p className="support-intro">
