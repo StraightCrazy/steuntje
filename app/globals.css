@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Italianno&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Italianno&family=Inter:wght@400;500&display=swap");
 
 /* ==================================================
    DESIGN TOKENS
@@ -7,14 +7,14 @@
   --ink: #2f2a26;
   --muted: #6f6a65;
 
-  --accent: rgba(143, 170, 123, 0.85);
-  --accent-strong: rgba(111, 143, 99, 0.9);
+  --accent: #8faa7b;
+  --accent-soft: rgba(143, 170, 123, 0.75);
 
   --card-bg: rgba(255, 255, 255, 0.78);
   --card-border: rgba(0, 0, 0, 0.04);
 
   --overlay-light: rgba(245, 248, 243, 0.72);
-  --overlay-dark: rgba(18, 22, 18, 0.74);
+  --overlay-dark: rgba(18, 22, 18, 0.75);
 }
 
 /* Nachtmodus */
@@ -43,10 +43,14 @@ body {
 body {
   font-family: "Inter", system-ui, sans-serif;
   color: var(--ink);
-  line-height: 1.65;
+  line-height: 1.7;
 
   background:
-    linear-gradient(to bottom, var(--overlay-light), var(--overlay-light)),
+    linear-gradient(
+      to bottom,
+      var(--overlay-light),
+      var(--overlay-light)
+    ),
     url("/backgrounds/bos-mos.jpg") center / cover no-repeat fixed;
 
   background-blend-mode: soft-light;
@@ -55,7 +59,11 @@ body {
 
 body.avond {
   background:
-    linear-gradient(to bottom, var(--overlay-dark), var(--overlay-dark)),
+    linear-gradient(
+      to bottom,
+      var(--overlay-dark),
+      var(--overlay-dark)
+    ),
     url("/backgrounds/bos-mos.jpg") center / cover no-repeat fixed;
 }
 
@@ -68,7 +76,7 @@ body.avond {
   padding: 2.4rem 0 3rem;
 
   display: grid;
-  gap: 1.4rem;
+  gap: 1.5rem;
   grid-template-columns: 1.2fr 0.8fr;
 }
 
@@ -88,11 +96,11 @@ body.avond {
   border-radius: 26px;
   border: 1px solid var(--card-border);
 
-  backdrop-filter: blur(5px);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(7px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
 
   padding: 1.8rem;
-  animation: fadeUp 0.9s ease both;
+  animation: fadeUp 0.8s ease both;
 }
 
 /* ==================================================
@@ -102,39 +110,23 @@ body.avond {
   font-family: "Italianno", cursive;
   font-size: 3.6rem;
   text-align: center;
-  color: var(--accent-strong);
+  color: var(--accent);
 
-  margin-bottom: 0.4rem;
+  margin-bottom: 1.2rem;
   transform: rotate(-2deg);
   position: relative;
 
-  animation: titleIn 1.6s ease both;
+  animation: titleIn 1.4s ease both;
 }
 
-/* subtiel hartje exact onder titel */
+/* sierlijke onderlijn + één subtiel hartje */
 .app-title::after {
   content: "♡";
   display: block;
+  margin: 0.35rem auto 0;
   font-size: 0.85rem;
-  margin: 0.2rem auto 0.4rem;
+  color: currentColor;
   opacity: 0.45;
-}
-
-/* sierlijke lijn */
-.app-title::before {
-  content: "";
-  display: block;
-  width: 68%;
-  height: 2px;
-  margin: 0.3rem auto 0;
-
-  background: linear-gradient(
-    to right,
-    transparent,
-    currentColor,
-    transparent
-  );
-  opacity: 0.4;
 }
 
 body.avond .app-title {
@@ -144,28 +136,27 @@ body.avond .app-title {
 /* ==================================================
    TEKST
 ================================================== */
-h1 {
+h2 {
+  font-size: 1.2rem;
   font-weight: 500;
-  font-size: 1.35rem;
   margin-bottom: 0.6rem;
 }
 
-h2 {
-  font-size: 1.2rem;
-  margin-bottom: 0.4rem;
-}
-
 .steuntje-text {
+  font-family: "Inter", system-ui, sans-serif;
   font-size: 1.08rem;
-  line-height: 1.85;
+  line-height: 1.95;
   letter-spacing: 0.015em;
-  margin: 0.6rem 0 0.9rem;
-  color: #3a3531;
+  font-weight: 400;
+  color: var(--ink);
+  opacity: 0.95;
 }
 
 body.avond .steuntje-text {
   color: #f3f1ee;
+  opacity: 0.92;
 }
+
 
 .mini-actie,
 .afsluit-zin {
@@ -181,36 +172,40 @@ button,
 .share-button {
   border: none;
   border-radius: 999px;
-  padding: 0.65rem 1.1rem;
+  padding: 0.7rem 1.2rem;
 
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
 
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent-strong)
-  );
-
+  background: rgba(143, 170, 123, 0.65);
   color: #fff;
-  opacity: 0.9;
 
-  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  backdrop-filter: blur(2px);
+  opacity: 0.85;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 button:hover,
 .share-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
   opacity: 1;
+  transform: translateY(-1px);
 }
+
 
 /* CTA spacing */
 .save-row {
   display: flex;
-  gap: 1.1rem;
+  gap: 1.4rem;
   flex-wrap: wrap;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+@media (max-width: 600px) {
+  .save-row {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
 }
 
 /* ==================================================
@@ -233,7 +228,6 @@ button:hover,
 body.avond .gevoel-input {
   background: rgba(18, 22, 18, 0.9);
   color: #f2f1ee;
-  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ==================================================
@@ -243,17 +237,17 @@ body.avond .gevoel-input {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.9rem;
 }
 
 .saved-item {
-  padding: 0.9rem 1.1rem;
-  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.65);
 }
 
 body.avond .saved-item {
-  background: rgba(30, 34, 30, 0.78);
+  background: rgba(30, 34, 30, 0.75);
 }
 
 /* ==================================================
@@ -273,7 +267,7 @@ body.avond .saved-item {
 @keyframes titleIn {
   from {
     opacity: 0;
-    transform: translateY(8px) rotate(-2deg);
+    transform: translateY(6px) rotate(-2deg);
   }
   to {
     opacity: 1;

@@ -131,7 +131,7 @@ export default function Home() {
       <section className="hero-card">
         {/* 🌿 APP NAAM */}
         <h1 className="app-title">Steuntje</h1>
-        <div className="app-heart">♡</div>
+        
 
         {/* 🌿 Introzin */}
         <h2 className="hero-zin">
