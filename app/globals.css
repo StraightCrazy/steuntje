@@ -1,37 +1,41 @@
-@import url("https://fonts.googleapis.com/css2?family=Italianno&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Italianno&family=Inter:wght@400;500;600&display=swap");
 
 /* ==================================================
    DESIGN TOKENS
 ================================================== */
 :root {
-  --ink: #2f2a25;
-  --muted: #6f6a63;
-  --accent: #8fa97a;
-  --accent-soft: rgba(143,169,122,0.18);
-  --card: rgba(255,255,255,0.92);
-  --line: rgba(0,0,0,0.06);
+  --ink: #2f2a26;
+  --muted: #6f6a65;
+  --accent: #8faa7b;
+  --accent-strong: #6f8f63;
+
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(0, 0, 0, 0.04);
+
+  --overlay-light: rgba(245, 248, 243, 0.88);
+  --overlay-dark: rgba(18, 22, 18, 0.82);
 }
 
-/* Nacht */
+/* Nachtmodus */
 body.avond {
-  --ink: #f3efe9;
-  --muted: #b9b2aa;
-  --accent: #9fc48a;
-  --accent-soft: rgba(159,196,138,0.18);
-  --card: rgba(28,32,28,0.92);
-  --line: rgba(255,255,255,0.08);
+  --ink: #f2f1ee;
+  --muted: #b8b5af;
+
+  --card-bg: rgba(24, 28, 24, 0.9);
+  --card-border: rgba(255, 255, 255, 0.05);
 }
 
 /* ==================================================
    RESET
 ================================================== */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   min-height: 100%;
 }
 
@@ -40,36 +44,46 @@ body {
   color: var(--ink);
   line-height: 1.65;
 
-  /* 🌿 BOS / MOS ACHTERGROND */
+  /* 🌿 BOS & MOS ACHTERGROND */
   background:
-    radial-gradient(circle at 20% 20%, rgba(180,205,160,0.35), transparent 45%),
-    radial-gradient(circle at 80% 30%, rgba(140,180,150,0.25), transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(200,220,190,0.35), transparent 55%),
-    linear-gradient(160deg, #eef4ec, #dde8dd);
+    linear-gradient(
+      to bottom,
+      var(--overlay-light),
+      var(--overlay-light)
+    ),
+    url("/backgrounds/bos-mos.jpg") center / cover no-repeat fixed;
 
-  background-attachment: fixed;
   transition: background 0.8s ease, color 0.6s ease;
 }
 
 body.avond {
   background:
-    radial-gradient(circle at 20% 20%, rgba(60,90,70,0.35), transparent 45%),
-    radial-gradient(circle at 80% 30%, rgba(40,70,55,0.25), transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(70,100,80,0.35), transparent 55%),
-    linear-gradient(160deg, #1a221c, #121814);
+    linear-gradient(
+      to bottom,
+      var(--overlay-dark),
+      var(--overlay-dark)
+    ),
+    url("/backgrounds/bos-mos.jpg") center / cover no-repeat fixed;
 }
 
 /* ==================================================
    LAYOUT
 ================================================== */
 .app-shell {
-  width: min(1040px, calc(100% - 2rem));
+  width: min(1040px, 100% - 2rem);
   margin: 0 auto;
-  padding: 2.6rem 0 3rem;
+  padding: 2.5rem 0 3rem;
 
   display: grid;
   gap: 1.4rem;
   grid-template-columns: 1.2fr 0.8fr;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    padding: 1.6rem 0;
+  }
 }
 
 /* ==================================================
@@ -77,28 +91,34 @@ body.avond {
 ================================================== */
 .hero-card,
 .support-card {
-  background: var(--card);
-  border-radius: 28px;
-  padding: 1.8rem;
+  background: var(--card-bg);
+  border-radius: 26px;
+  border: 1px solid var(--card-border);
 
   box-shadow:
-    0 20px 45px rgba(0,0,0,0.12),
-    inset 0 1px 0 rgba(255,255,255,0.6);
+    0 25px 60px rgba(0, 0, 0, 0.12);
+
+  padding: 1.8rem;
 
   animation: fadeUp 0.9s ease both;
 }
 
+.support-card {
+  padding: 1.6rem;
+}
+
 /* ==================================================
-   APP NAAM – HANDGESCHREVEN
+   APP NAAM — STEUNTJE
 ================================================== */
 .app-title {
   font-family: "Italianno", cursive;
   font-size: 3.8rem;
   text-align: center;
-  margin-bottom: 1.2rem;
+  color: var(--accent-strong);
 
-  color: var(--accent);
+  margin-bottom: 1.4rem;
   transform: rotate(-2deg);
+
   animation: titleIn 1.6s ease both;
 }
 
@@ -108,77 +128,86 @@ body.avond {
   width: 70%;
   height: 2px;
   margin: 0.3rem auto 0;
-  background: linear-gradient(to right, transparent, currentColor, transparent);
+
+  background: linear-gradient(
+    to right,
+    transparent,
+    currentColor,
+    transparent
+  );
+
   opacity: 0.6;
 }
 
-/* ==================================================
-   TITELS & TEKST
-================================================== */
-h1, h2 {
-  font-family: "Playfair Display", serif;
+body.avond .app-title {
+  color: #b7cfac;
 }
 
+/* ==================================================
+   TEKST
+================================================== */
 h1 {
-  font-size: 1.6rem;
-  margin-bottom: 0.8rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 1.35rem;
+  margin-bottom: 0.6rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
 }
 
 .steuntje-text {
-  font-family: "Playfair Display", serif;
-  font-size: 1.15rem;
-  line-height: 1.85;
+  font-family: "Italianno", cursive;
+  font-size: 1.55rem;
+  line-height: 1.9;
+  margin: 0.6rem 0 0.9rem;
+}
+
+body.avond .steuntje-text {
+  color: #f5f4f1;
+}
+
+.mini-actie {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin-top: 0.6rem;
 }
 
 .afsluit-zin {
   font-style: italic;
+  font-size: 0.9rem;
   color: var(--muted);
-  margin-top: 0.8rem;
+  margin-top: 0.6rem;
 }
 
 /* ==================================================
-   THEME CHIPS
+   BUTTONS
 ================================================== */
-.theme-switcher {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.2rem;
-}
-
-.theme-chip {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  background: transparent;
-  color: var(--muted);
-}
-
-.theme-chip.is-active {
-  background: var(--accent);
-  color: #fff;
-  border-color: transparent;
-}
-
-/* ==================================================
-   KNOPPEN
-================================================== */
-.gevoel-knop,
-.audio-knop,
+button,
 .share-button {
   border: none;
   border-radius: 999px;
-  padding: 0.7rem 1.1rem;
-  font-weight: 500;
+  padding: 0.65rem 1.1rem;
+
+  font-size: 0.9rem;
   cursor: pointer;
 
-  background: var(--accent);
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-strong)
+  );
+
   color: #fff;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.save-knop::before {
-  content: "♡ ";
+button:hover,
+.share-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
 /* ==================================================
@@ -187,34 +216,162 @@ h1 {
 .gevoel-input {
   width: 100%;
   border-radius: 14px;
-  border: 1px solid var(--line);
-  padding: 0.85rem;
-  margin-bottom: 0.6rem;
+  border: 1px solid var(--card-border);
+  padding: 0.85rem 1rem;
+
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink);
 }
 
 body.avond .gevoel-input {
-  background: rgba(15,18,16,0.95);
-  color: #f4efe9;
+  background: rgba(20, 24, 20, 0.9);
+  color: #f2f1ee;
+}
+
+/* ==================================================
+   SAVED LIST
+================================================== */
+.saved-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.saved-item {
+  padding: 0.9rem 1.1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+body.avond .saved-item {
+  background: rgba(30, 34, 30, 0.8);
 }
 
 /* ==================================================
    ANIMATIES
 ================================================== */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes titleIn {
-  0% { opacity: 0; transform: translateY(8px) rotate(-2deg); }
-  100% { opacity: 1; transform: translateY(0) rotate(-2deg); }
+  0% {
+    opacity: 0;
+    transform: translateY(8px) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(-2deg);
+  }
 }
 
 /* ==================================================
-   MOBIEL
+   REDUCED MOTION
 ================================================== */
-@media (max-width: 900px) {
-  .app-shell {
-    grid-template-columns: 1fr;
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
   }
+}
+/* ==================================================
+   STAP 3 — WARMTE, LEESBAARHEID & RUST
+   (definitieve afwerking)
+================================================== */
+
+/* -------- Steuntje-tekst: warmer, menselijker -------- */
+.steuntje-text {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+body.avond .steuntje-text {
+  color: #f3f1ee;
+}
+
+/* subtiele adem bij hover (niet storend) */
+.steuntje-panel:hover .steuntje-text {
+  letter-spacing: 0.015em;
+}
+
+/* -------- Mini-actie & afsluit-zin -------- */
+.mini-actie,
+.afsluit-zin {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* -------- Achtergrond: iets zichtbaarder -------- */
+body {
+  background-blend-mode: soft-light;
+}
+
+/* kaarten laten iets van achtergrond door */
+.hero-card,
+.support-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(6px);
+}
+
+body.avond .hero-card,
+body.avond .support-card {
+  background: rgba(24, 28, 24, 0.88);
+}
+
+/* -------- Audio-knop: warm & consistent -------- */
+.audio-knop {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-top: 0.6rem;
+
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.88rem;
+
+  color: var(--accent);
+  cursor: pointer;
+  opacity: 0.85;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.audio-knop:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+body.avond .audio-knop {
+  color: #b7cfac;
+}
+
+/* -------- Input: nachtmodus leesbaar fix -------- */
+.gevoel-input {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+}
+
+.gevoel-input::placeholder {
+  color: var(--muted);
+}
+
+body.avond .gevoel-input {
+  background: rgba(18, 22, 18, 0.92);
+  color: #f2f1ee;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.avond .gevoel-input::placeholder {
+  color: #b8b5af;
 }

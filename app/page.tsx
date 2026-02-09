@@ -127,15 +127,21 @@ export default function Home() {
   /* ================= RENDER ================= */
   return (
     <main className="app-shell">
+      {/* ================= HERO ================= */}
       <section className="hero-card">
-        
+        {/* 🌿 APP NAAM */}
+        <h1 className="app-title">
+          Steuntje <span className="app-heart">♡</span>
+        </h1>
 
-        <h1>
+        {/* 🌿 Introzin */}
+        <h2 className="hero-zin">
           {isAvond
             ? "De dag mag hier even eindigen."
             : "Je hoeft het even niet alleen te dragen."}
-        </h1>
+        </h2>
 
+        {/* 🌿 Thema's */}
         <div className="theme-switcher">
           {getThemeOptions().map((theme) => (
             <button
@@ -150,6 +156,7 @@ export default function Home() {
           ))}
         </div>
 
+        {/* 🌿 Steuntje */}
         <article className="steuntje-panel">
           <p className="steuntje-subtitle">{titelVanVandaag}</p>
           <p className="steuntje-text">{tekstVanVandaag}</p>
@@ -167,6 +174,7 @@ export default function Home() {
           {isAvond && <AudioSteuntje text={audioTekst} />}
         </article>
 
+        {/* 🌿 Acties */}
         <div className="cta-row">
           <div className="save-row">
             <button
@@ -174,7 +182,7 @@ export default function Home() {
               onClick={saveSteuntje}
               className="gevoel-knop save-knop"
             >
-              🤍 Bewaar dit steuntje
+              ♡ Bewaar dit steuntje
             </button>
 
             <a href="#voor-later" className="voor-later-link">
@@ -199,6 +207,7 @@ export default function Home() {
         )}
       </section>
 
+      {/* ================= VOOR LATER ================= */}
       <section id="voor-later" className="support-card">
         <h2>Voor later bewaard</h2>
 
@@ -223,6 +232,7 @@ export default function Home() {
         )}
       </section>
 
+      {/* ================= GEVOEL ================= */}
       <section className="support-card">
         <h2>{isAvond ? "Wil je de dag loslaten?" : "Wil je iets kwijt?"}</h2>
 
