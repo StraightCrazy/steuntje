@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Steuntje",
+    "tagline_day": "Je hoeft het even niet alleen te dragen.",
+    "tagline_evening": "De dag mag hier even eindigen.",
+
+    "live_support_title": "Dit is er nu voor jou",
+
+    "maybe_this_helps": "Misschien helpt dit nu:",
+    "closing_day": "Dat is genoeg voor nu.",
+    "closing_evening": "Je hoeft vandaag niets meer te dragen.",
+
+    "save_support": "Bewaar dit steuntje",
+    "saved_feedback": "Opgeslagen. Je vindt het hieronder terug 💛",
+
+    "saved_title": "Bewaarde steuntjes",
+    "saved_empty": "Wat je bewaart, verschijnt hier. Zonder druk.",
+
+    "let_go_title": "Wil je de dag loslaten?",
+    "vent_title": "Wil je iets kwijt?",
+
+    "input_placeholder": "Je mag het hier neerleggen…",
+    "give_support": "Geef me een steuntje",
+    "listening": "Ik luister…",
+
+    "demo_hint": "Dit is een demo-versie. Je eigen steuntjes verschijnen zodra alles gekoppeld is."
+  }
+}

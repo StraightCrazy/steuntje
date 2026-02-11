@@ -1,6 +1,5 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Steuntje",
@@ -23,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="nl" suppressHydrationWarning>
       <body>
-        <ThemeToggle />
+        
         {children}
       </body>
     </html>
