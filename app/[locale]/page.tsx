@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ShareButton from "@/components/ShareButton";
@@ -27,7 +28,7 @@ export default function Home() {
 
   useEffect(() => {
     const uur = new Date().getHours();
-    const avond = uur >= 20 || uur < 6;
+    const avond = uur >= 20 || uur < 4;
     setIsAvond(avond);
     document.body.classList.toggle("avond", avond);
   }, []);
@@ -42,6 +43,7 @@ export default function Home() {
   const [opgeslagen, setOpgeslagen] = useState(false);
   const [savedSteuntjes, setSavedSteuntjes] = useState<string[]>([]);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const locale = useLocale();
 
   /* ================= INIT ================= */
   useEffect(() => {
@@ -55,8 +57,8 @@ export default function Home() {
 
   /* ================= STEUNTJE ================= */
   const fallbackSteuntje = useMemo(
-    () => getSteuntjeByTheme(gekozenThema),
-    [gekozenThema]
+    () => getSteuntjeByTheme(gekozenThema, locale),
+    [gekozenThema, locale]
   );
 
   const tekstVanVandaag = tekstUitDatabase ?? fallbackSteuntje.text;

@@ -84,11 +84,33 @@ export function getThemeOptions() {
   return ["rust", "moed", "hoop", "focus"] as const;
 }
 
-export function getSteuntjeByTheme(theme: SteuntjeTheme, date = new Date()): ThemedSteuntje {
+export function getSteuntjeByTheme(
+  theme: SteuntjeTheme,
+  locale: string = "nl",
+  date = new Date()
+): ThemedSteuntje {
   const filtered = steuntjes.filter((item) => item.theme === theme);
+
   if (!filtered.length) {
     return getFallbackSteuntje(date);
   }
+
   const index = hashDay(date) % filtered.length;
-  return filtered[index];
+  const steun = filtered[index];
+
+  if (locale === "en") {
+    return {
+      ...steun,
+      text: translateToEnglish(steun.text),
+      miniActie: translateToEnglish(steun.miniActie),
+    };
+  }
+
+  return steun;
+}
+
+
+function translateToEnglish(text: string): string {
+  // tijdelijke eenvoudige vertaling (later verbeteren)
+  return text;
 }
