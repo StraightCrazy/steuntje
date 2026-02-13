@@ -1,9 +1,10 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getSteuntjes(locale: string) {
+  if (!supabase) return null;
+
   const vandaag = new Date().toISOString().slice(0, 10);
 
-  // 🔁 Kies tabel op basis van taal
   const tabel =
     locale === "en" ? "daily_supports" : "steuntjes";
 
@@ -13,10 +14,7 @@ export async function getSteuntjes(locale: string) {
     .eq("datum", vandaag)
     .single();
 
-  if (error || !data) {
-    console.error("Geen steuntje gevonden:", error);
-    return null;
-  }
+  if (error || !data) return null;
 
   return data.tekst;
 }
