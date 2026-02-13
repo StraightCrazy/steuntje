@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ShareButton from "@/components/ShareButton";
 import AudioSteuntje from "@/components/AudioSteuntje";
-import { getSteuntjeVanVandaag } from "@/lib/getSteuntjes";
+import { getSteuntjes } from "@/lib/getSteuntjes";
 import { trackView } from "@/lib/stats";
 import {
   type SteuntjeTheme,
@@ -47,8 +47,17 @@ export default function Home() {
 
   /* ================= INIT ================= */
   useEffect(() => {
-    getSteuntjeVanVandaag().then(setTekstUitDatabase);
-    trackView();
+    const locale = useLocale();
+
+useEffect(() => {
+  getSteuntjes(locale).then(setTekstUitDatabase);
+  trackView();
+
+  const bestaand =
+    JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
+  setSavedSteuntjes(bestaand);
+}, [locale]);
+
 
     const bestaand =
       JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
