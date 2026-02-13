@@ -5,25 +5,26 @@ export async function getSteuntjes(locale: string) {
 
   const vandaag = new Date().toISOString().slice(0, 10);
 
-  const tabel = locale === "en"
-    ? "daily_supports"
-    : "steuntjes";
+  if (locale === "en") {
+    const { data, error } = await supabase
+      .from("daily_supports")
+      .select("text")
+      .eq("date", vandaag)
+      .single();
 
-  const kolomDatum = locale === "en"
-    ? "date"
-    : "datum";
+    if (error || !data) return null;
 
-  const kolomTekst = locale === "en"
-    ? "text"
-    : "tekst";
+    return data.text;
+  }
 
+  // NL
   const { data, error } = await supabase
-    .from(tabel)
-    .select(kolomTekst)
-    .eq(kolomDatum, vandaag)
+    .from("steuntjes")
+    .select("tekst")
+    .eq("datum", vandaag)
     .single();
 
   if (error || !data) return null;
 
-  return data[kolomTekst];
+  return data.tekst;
 }

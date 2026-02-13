@@ -1,8 +1,7 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
 import ShareButton from "@/components/ShareButton";
 import AudioSteuntje from "@/components/AudioSteuntje";
 import { getSteuntjes } from "@/lib/getSteuntjes";
@@ -22,6 +21,7 @@ type ApiResponse = {
 
 export default function Home() {
   const t = useTranslations("app");
+  const locale = useLocale(); // ✅ HOOK MOET HIER
 
   /* ================= DAG / AVOND ================= */
   const [isAvond, setIsAvond] = useState(false);
@@ -35,7 +35,8 @@ export default function Home() {
 
   /* ================= STATE ================= */
   const [tekstUitDatabase, setTekstUitDatabase] = useState<string | null>(null);
-  const [gekozenThema, setGekozenThema] = useState<SteuntjeTheme>("rust");
+  const [gekozenThema, setGekozenThema] =
+    useState<SteuntjeTheme>("rust");
   const [gevoel, setGevoel] = useState("");
   const [aiAntwoord, setAiAntwoord] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
@@ -43,26 +44,16 @@ export default function Home() {
   const [opgeslagen, setOpgeslagen] = useState(false);
   const [savedSteuntjes, setSavedSteuntjes] = useState<string[]>([]);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const locale = useLocale();
 
   /* ================= INIT ================= */
   useEffect(() => {
-    const locale = useLocale();
-
-useEffect(() => {
-  getSteuntjes(locale).then(setTekstUitDatabase);
-  trackView();
-
-  const bestaand =
-    JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
-  setSavedSteuntjes(bestaand);
-}, [locale]);
-
+    getSteuntjes(locale).then(setTekstUitDatabase);
+    trackView();
 
     const bestaand =
       JSON.parse(localStorage.getItem("savedSteuntjes") || "[]") as string[];
     setSavedSteuntjes(bestaand);
-  }, []);
+  }, [locale]); // ✅ opnieuw laden bij taalwissel
 
   /* ================= STEUNTJE ================= */
   const fallbackSteuntje = useMemo(
@@ -70,7 +61,9 @@ useEffect(() => {
     [gekozenThema, locale]
   );
 
-  const tekstVanVandaag = tekstUitDatabase ?? fallbackSteuntje.text;
+  const tekstVanVandaag =
+    tekstUitDatabase ?? fallbackSteuntje.text;
+
   const titelVanVandaag = tekstUitDatabase
     ? t("live_support_title")
     : fallbackSteuntje.title;
@@ -78,9 +71,7 @@ useEffect(() => {
   const miniActie = fallbackSteuntje.miniActie;
 
   const audioTekst = `${tekstVanVandaag}. ${
-    isAvond
-      ? t("closing_evening")
-      : t("closing_day")
+    isAvond ? t("closing_evening") : t("closing_day")
   }`;
 
   /* ================= OPSLAAN ================= */
@@ -100,7 +91,10 @@ useEffect(() => {
 
     setOpgeslagen(true);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    saveTimeout.current = setTimeout(() => setOpgeslagen(false), 2200);
+    saveTimeout.current = setTimeout(
+      () => setOpgeslagen(false),
+      2200
+    );
   }
 
   function verwijderSteuntje(index: number) {
@@ -196,9 +190,7 @@ useEffect(() => {
         </div>
 
         {!hasSupabaseConfig && (
-          <p className="setup-hint">
-            {t("demo_hint")}
-          </p>
+          <p className="setup-hint">{t("demo_hint")}</p>
         )}
       </section>
 
@@ -206,9 +198,7 @@ useEffect(() => {
         <h2>{t("saved_title")}</h2>
 
         {savedSteuntjes.length === 0 ? (
-          <p className="support-intro">
-            {t("saved_empty")}
-          </p>
+          <p className="support-intro">{t("saved_empty")}</p>
         ) : (
           <ul className="saved-list">
             {savedSteuntjes.map((tekst, i) => (
