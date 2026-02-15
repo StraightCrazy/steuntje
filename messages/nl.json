@@ -1,10 +1,10 @@
 {
   "app": {
-    "title": "Steuntje",
+    "title":"Steuntje",
     "tagline_day": "Je hoeft het even niet alleen te dragen.",
     "tagline_evening": "De dag mag hier even eindigen.",
 
-    "live_support_title": "Dit is er nu voor jou, 👉 -steuntje van de dag- ",
+    "live_support_title": "Dit is er nu voor jou 👉 steuntje van de dag",
 
     "maybe_this_helps": "Misschien helpt dit nu:",
     "closing_day": "Dat is genoeg voor nu.",
@@ -12,7 +12,6 @@
 
     "save_support": "Bewaar dit steuntje",
     "saved_feedback": "Opgeslagen. Je vindt het hieronder terug 💛",
-
     "saved_title": "Bewaarde steuntjes",
     "saved_empty": "Wat je bewaart, verschijnt hier. Zonder druk.",
 
@@ -24,5 +23,11 @@
     "listening": "Ik luister…",
 
     "demo_hint": "Dit is een demo-versie. Je eigen steuntjes verschijnen zodra alles gekoppeld is."
+  },
+
+  "share": {
+    "title": "Steuntje",
+    "button": "Delen",
+    "feedback": "Deel dit steuntje met iemand die het kan gebruiken"
   }
 }

@@ -1,116 +1,153 @@
 export type SteuntjeTheme = "rust" | "moed" | "hoop" | "focus";
 
+export type Locale = "nl" | "en";
+
 export type ThemedSteuntje = {
+  theme: SteuntjeTheme;
+  title: Record<Locale, string>;
+  text: Record<Locale, string>;
+  miniActie: Record<Locale, string>;
+};
+
+export type ResolvedSteuntje = {
   theme: SteuntjeTheme;
   title: string;
   text: string;
   miniActie: string;
 };
 
-export const themeLabels: Record<SteuntjeTheme, string> = {
-  rust: "Rust",
-  moed: "Moed",
-  hoop: "Hoop",
-  focus: "Focus",
-};
-
 const steuntjes: ThemedSteuntje[] = [
   {
     theme: "rust",
-    title: "Ademruimte",
-    text: "Je hoeft niet alles tegelijk te dragen. Kies één klein ding dat vandaag genoeg is, en laat de rest even zachtjes op pauze staan.",
-    miniActie: "Leg je hand op je hart en adem 4 tellen in, 6 tellen uit. Herhaal dit 3 keer.",
+    title: {
+      nl: "Ademruimte",
+      en: "Breathing space",
+    },
+    text: {
+      nl: "Je hoeft niet alles tegelijk te dragen. Kies één klein ding dat vandaag genoeg is.",
+      en: "You don’t have to carry everything at once. Choose one small thing that is enough for today.",
+    },
+    miniActie: {
+      nl: "Leg je hand op je hart en adem 4 tellen in, 6 tellen uit.",
+      en: "Place your hand on your heart and breathe in for 4 counts, out for 6.",
+    },
   },
+
   {
     theme: "moed",
-    title: "Kleine stap, groot verschil",
-    text: "Moed is niet dat je nergens bang voor bent. Moed is dat je toch één stap zet, ook met bibber in je benen.",
-    miniActie: "Schrijf de kleinste volgende stap op een post-it en doe die binnen 10 minuten.",
+    title: {
+      nl: "Kleine stap, groot verschil",
+      en: "Small step, big difference",
+    },
+    text: {
+      nl: "Moed is dat je toch één stap zet, ook met bibber in je benen.",
+      en: "Courage is taking one step forward, even when your legs are shaking.",
+    },
+    miniActie: {
+      nl: "Schrijf de kleinste volgende stap op en doe die binnen 10 minuten.",
+      en: "Write down the smallest next step and do it within 10 minutes.",
+    },
   },
+
   {
     theme: "hoop",
-    title: "Lichtpunt",
-    text: "Soms voelt vooruitgaan traag. Toch ben je niet stilgevallen: je bent onderweg, zelfs op dagen die zwaar aanvoelen.",
-    miniActie: "Noteer 1 ding dat vandaag wél lukte, hoe klein ook.",
+    title: {
+      nl: "Lichtpunt",
+      en: "A small light",
+    },
+    text: {
+      nl: "Je bent onderweg, zelfs op dagen die zwaar aanvoelen.",
+      en: "You are still moving forward, even on heavy days.",
+    },
+    miniActie: {
+      nl: "Noteer 1 ding dat vandaag wél lukte.",
+      en: "Write down one thing that went well today.",
+    },
   },
+
   {
     theme: "focus",
-    title: "Eén ding tegelijk",
-    text: "Je hoofd hoeft niet perfect stil te zijn om te beginnen. Geef jezelf toestemming om gewoon te starten, onvolmaakt en echt.",
-    miniActie: "Zet een timer van 12 minuten en werk aan slechts één taak.",
-  },
-  {
-    theme: "rust",
-    title: "Zachter voor jezelf",
-    text: "Praat tegen jezelf zoals je tegen iemand spreekt die je graag ziet: met mildheid, met geduld, met ruimte.",
-    miniActie: "Vervang één strenge gedachte door: ‘Ik ben aan het leren.’",
-  },
-  {
-    theme: "hoop",
-    title: "Morgen is nieuw",
-    text: "Vandaag hoeft niet perfect te eindigen om morgen mooi te mogen beginnen. Er is altijd een nieuw begin in kleine vormen.",
-    miniActie: "Kies nu al 1 fijn startmoment voor morgen (koffie, muziek, korte wandeling).",
-  },
-  {
-    theme: "moed",
-    title: "Je doet het toch",
-    text: "Ook als niemand ziet hoeveel je probeert: jouw inzet telt. Jouw zachtheid telt. Jouw volhouden telt.",
-    miniActie: "Stuur één bericht naar iemand die je vertrouwt: ‘Ik kon vandaag wat steun gebruiken.’",
-  },
-  {
-    theme: "focus",
-    title: "Rust in je hoofd",
-    text: "Als alles belangrijk lijkt, raakt je energie versnipperd. Kies één prioriteit en bescherm die met aandacht.",
-    miniActie: "Zet meldingen 30 minuten uit en maak je belangrijkste taak af.",
+    title: {
+      nl: "Eén ding tegelijk",
+      en: "One thing at a time",
+    },
+    text: {
+      nl: "Geef jezelf toestemming om gewoon te starten.",
+      en: "Give yourself permission to just begin.",
+    },
+    miniActie: {
+      nl: "Zet een timer van 12 minuten en werk aan één taak.",
+      en: "Set a 12-minute timer and work on one task only.",
+    },
   },
 ];
 
 function hashDay(date: Date): number {
   const key = date.toISOString().slice(0, 10);
   let hash = 0;
-  for (let i = 0; i < key.length; i += 1) {
+
+  for (let i = 0; i < key.length; i++) {
     hash = (hash << 5) - hash + key.charCodeAt(i);
     hash |= 0;
   }
-  return Math.abs(hash);
-}
 
-export function getFallbackSteuntje(date = new Date()): ThemedSteuntje {
-  const index = hashDay(date) % steuntjes.length;
-  return steuntjes[index];
+  return Math.abs(hash);
 }
 
 export function getThemeOptions() {
   return ["rust", "moed", "hoop", "focus"] as const;
 }
 
+export function getFallbackSteuntje(
+  locale: Locale = "nl",
+  date = new Date()
+): ResolvedSteuntje {
+  const index = hashDay(date) % steuntjes.length;
+  const s = steuntjes[index];
+
+  return {
+    theme: s.theme,
+    title: s.title[locale],
+    text: s.text[locale],
+    miniActie: s.miniActie[locale],
+  };
+}
+
 export function getSteuntjeByTheme(
   theme: SteuntjeTheme,
-  locale: string = "nl",
+  locale: Locale = "nl",
   date = new Date()
-): ThemedSteuntje {
-  const filtered = steuntjes.filter((item) => item.theme === theme);
+): ResolvedSteuntje {
+  const filtered = steuntjes.filter((s) => s.theme === theme);
 
-  if (!filtered.length) {
-    return getFallbackSteuntje(date);
+  if (filtered.length === 0) {
+    return getFallbackSteuntje(locale, date);
   }
 
   const index = hashDay(date) % filtered.length;
-  const steun = filtered[index];
+  const s = filtered[index];
 
+  return {
+    theme: s.theme,
+    title: s.title[locale],
+    text: s.text[locale],
+    miniActie: s.miniActie[locale],
+  };
+}
+export function getThemeLabels(locale: "nl" | "en") {
   if (locale === "en") {
     return {
-      ...steun,
-      text: translateToEnglish(steun.text),
-      miniActie: translateToEnglish(steun.miniActie),
+      rust: "Calm",
+      moed: "Courage",
+      hoop: "Hope",
+      focus: "Focus",
     };
   }
 
-  return steun;
-}
-
-
-function translateToEnglish(text: string): string {
-  // tijdelijke eenvoudige vertaling (later verbeteren)
-  return text;
+  return {
+    rust: "Rust",
+    moed: "Moed",
+    hoop: "Hoop",
+    focus: "Focus",
+  };
 }

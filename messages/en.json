@@ -1,28 +1,33 @@
 {
   "app": {
-    "title": "Little Support",
+    "title":"Little Support",
     "tagline_day": "You don’t have to carry it alone right now.",
-    "tagline_evening": "The day may gently end here.",
+    "tagline_evening": "The day can end here for a moment.",
 
-    "live_support_title": "This is here for you, 👉 -little support of the day- ",
+    "live_support_title": "This is here for you 👉 support of the day",
 
     "maybe_this_helps": "Maybe this helps right now:",
     "closing_day": "That is enough for today.",
-    "closing_evening": "You don’t have to carry anything anymore today.",
+    "closing_evening": "You don’t have to carry anything else today.",
 
     "save_support": "Save this support",
     "saved_feedback": "Saved. You’ll find it below 💛",
-
     "saved_title": "Saved supports",
     "saved_empty": "What you save will appear here. No pressure.",
 
-    "let_go_title": "Do you want to let the day go?",
+    "let_go_title": "Do you want to let go of the day?",
     "vent_title": "Do you want to share something?",
 
     "input_placeholder": "You can place it here…",
     "give_support": "Give me support",
-    "listening": "I'm listening…",
+    "listening": "I’m listening…",
 
-    "demo_hint": "This is a demo version. Your personal supports will appear once everything is connected."
+    "demo_hint": "This is a demo version. Your own supports will appear once everything is connected."
+  },
+
+  "share": {
+    "title": "Little Support",
+    "button": "Share",
+    "feedback": "Share this support with someone who might need it"
   }
 }

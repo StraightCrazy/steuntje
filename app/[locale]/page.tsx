@@ -11,8 +11,9 @@ import {
   getFallbackSteuntje,
   getSteuntjeByTheme,
   getThemeOptions,
-  themeLabels,
+  getThemeLabels,
 } from "@/lib/steuntjesContent";
+
 import { hasSupabaseConfig } from "@/lib/supabase";
 
 type ApiResponse = {
@@ -22,6 +23,7 @@ type ApiResponse = {
 export default function Home() {
   const t = useTranslations("app");
   const locale = useLocale(); // ✅ HOOK MOET HIER
+const themeLabels = getThemeLabels(locale);
 
   /* ================= DAG / AVOND ================= */
   const [isAvond, setIsAvond] = useState(false);
@@ -73,7 +75,7 @@ export default function Home() {
   const audioTekst = `${tekstVanVandaag}. ${
     isAvond ? t("closing_evening") : t("closing_day")
   }`;
-
+ 
   /* ================= OPSLAAN ================= */
   function saveSteuntje() {
     const bestaand =
@@ -114,7 +116,7 @@ export default function Home() {
       const res = await fetch("/api/ik-voel-me", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gevoel }),
+        body: JSON.stringify({ gevoel, locale }),
       });
 
       const data = (await res.json()) as ApiResponse;

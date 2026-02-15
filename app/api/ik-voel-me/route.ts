@@ -1,68 +1,62 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import OpenAI from "openai";
+import { NextRequest, NextResponse } from "next/server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const gevoel = body.gevoel?.trim();
+    const { gevoel, locale } = await req.json();
 
     if (!gevoel) {
-      return NextResponse.json({
-        antwoord:
-          "Ik hoor je. Je hoeft het niet perfect te verwoorden. Wat er is, is genoeg.",
-      });
+      return NextResponse.json({ antwoord: "Geen gevoel ontvangen." });
     }
 
-    // 🔹 Prompt ophalen uit Supabase
-    const { data: settings } = await supabase
-      .from("ai_settings")
-      .select("prompt")
-      .eq("name", "steuntje_v1")
-      .single();
+    // 🧠 Slimme taalkeuze
+ let taal = "Dutch";
 
-    const systemPrompt =
-      settings?.prompt ??
-      "Je bent Steuntje. Je reageert warm, menselijk en veilig.";
+if (locale && locale.startsWith("en")) {
+  taal = "English";
+}
 
-    // 🔹 AI call
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
+
+    const systeemPrompt = `
+You are Steuntje, a warm supportive companion.
+
+Reply ONLY in ${taal}.
+Use a calm, kind, gentle tone.
+Keep the answer short and comforting.
+No therapy language.
+No long explanations.
+
+Sound like a caring human.
+`;
+
+    const response = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
         },
-        {
-          role: "user",
-          content: gevoel,
-        },
-      ],
-      temperature: 0.8,
-      max_tokens: 180,
-    });
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systeemPrompt },
+            { role: "user", content: gevoel },
+          ],
+          temperature: 0.7,
+        }),
+      }
+    );
+
+    const data = await response.json();
 
     const antwoord =
-      completion.choices[0]?.message?.content ??
-      "Ik ben hier bij je. Je hoeft het niet alleen te dragen.";
+      data.choices?.[0]?.message?.content ??
+      "Ik ben hier bij je.";
 
     return NextResponse.json({ antwoord });
   } catch (error) {
-    console.error("AI error:", error);
-
     return NextResponse.json({
-      antwoord:
-        "Ik ben hier bij je. Ook als woorden even struikelen. Neem rustig adem.",
+      antwoord: "Er ging iets mis, maar ik ben hier.",
     });
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   text: string;
@@ -8,6 +9,7 @@ type Props = {
 
 export default function ShareButton({ text }: Props) {
   const [canShare, setCanShare] = useState(false);
+  const t = useTranslations("share"); // 🔥 NIEUW
 
   useEffect(() => {
     if (typeof navigator !== "undefined" && "share" in navigator) {
@@ -19,7 +21,7 @@ export default function ShareButton({ text }: Props) {
     if (!canShare) return;
 
     navigator.share({
-      title: "Steuntje",
+      title: t("title"), // 🔥 vertaald
       text,
       url: window.location.href,
     });
@@ -32,10 +34,11 @@ export default function ShareButton({ text }: Props) {
   return (
     <div className="share-wrapper">
       <button onClick={delen} className="share-button" type="button">
-        Delen
+        {t("button")}
       </button>
+
       <span className="share-feedback">
-        Deel dit steuntje met iemand die het kan gebruiken
+        {t("feedback")}
       </span>
     </div>
   );
