@@ -22,7 +22,8 @@ type ApiResponse = {
 
 export default function Home() {
   const t = useTranslations("app");
-  const locale = useLocale(); // ✅ HOOK MOET HIER
+  const locale = useLocale() as "nl" | "en";
+
 const themeLabels = getThemeLabels(locale);
 
   /* ================= DAG / AVOND ================= */

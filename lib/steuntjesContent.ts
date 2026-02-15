@@ -134,7 +134,8 @@ export function getSteuntjeByTheme(
     miniActie: s.miniActie[locale],
   };
 }
-export function getThemeLabels(locale: "nl" | "en") {
+export function getThemeLabels(locale: string = "nl") {
+
   if (locale === "en") {
     return {
       rust: "Calm",
